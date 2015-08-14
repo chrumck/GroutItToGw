@@ -5,7 +5,7 @@ using System.Text;
 
 namespace GroutItToGw
 {
-    class AppSettings
+    public class AppSettings
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
@@ -26,7 +26,10 @@ namespace GroutItToGw
 
         public AppSettings()
         {
+            this.InputFolder = @"C:\_temp\inputFolder";
+            this.InputFolder = @"C:\_temp\outputFolder";
             this.folderScanSeconds = 10;
+
         }
 
     }

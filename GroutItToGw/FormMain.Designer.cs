@@ -54,6 +54,7 @@
             // 
             // BtnStop
             // 
+            this.BtnStop.Enabled = false;
             this.BtnStop.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnStop.Location = new System.Drawing.Point(12, 56);
             this.BtnStop.Name = "BtnStop";
@@ -61,6 +62,7 @@
             this.BtnStop.TabIndex = 13;
             this.BtnStop.Text = "Stop";
             this.BtnStop.UseVisualStyleBackColor = true;
+            this.BtnStop.Click += new System.EventHandler(this.BtnStop_Click);
             // 
             // LblErrCount
             // 

@@ -29,8 +29,17 @@ namespace GroutItToGw
         private void BtnStart_Click(object sender, EventArgs e)
         {
             BtnStart.Enabled = false;
-            TxBStatus.Text = "";
+            BtnStop.Enabled = true;
 
+            appMainService.StartFilesScanning();
+        }
+
+        private void BtnStop_Click(object sender, EventArgs e)
+        {
+            BtnStart.Enabled = true;
+            BtnStop.Enabled = false;
+
+            appMainService.StopFilesScanning();
         }
 
 
