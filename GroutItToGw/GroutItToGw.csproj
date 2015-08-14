@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppProgressEventArgs.cs" />
     <Compile Include="AppSettings.cs" />
     <Compile Include="AppMainService.cs" />
     <Compile Include="FormMain.cs">

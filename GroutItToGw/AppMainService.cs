@@ -11,44 +11,33 @@ namespace GroutItToGw
     public class AppMainService
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
-
-        public event EventHandler Progress;
-        public string ProgressMessage {get; private set;}
-
+        
+        public bool ScanIsRunning { get; private set; }
+        
+        public delegate void ProgressEventHandler(object sender, AppProgressEventArgs args);
+        public event ProgressEventHandler ScanProgress;
+        public event EventHandler ScanCancelled;
+        
         private AppSettings appSettings;
-
         private CancellationTokenSource cTokenSource;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
         public AppMainService(AppSettings appSettings)
         {
+            this.ScanIsRunning = false;
             this.appSettings = appSettings;
+            this.appSettings.ReadFromXML();
         }
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
-        //public method to fire up FilesScanningAsync()
-        public void StartFilesScanning()
-        {
-            cTokenSource = new CancellationTokenSource();
-            FilesScanningAsync(cTokenSource.Token, OnProgress);
-        }
-
-        public void StopFilesScanning()
-        {
-            if (cTokenSource != null && !cTokenSource.IsCancellationRequested)
-            {
-                cTokenSource.Cancel();
-            }
-        }
-
-        
         //main async method running infinite loop to scan files
-        private Task FilesScanningAsync(CancellationToken token, Func<string,string> progressCallback)
+        private Task FilesScanAsync(CancellationToken token, Action<string> progressCallback, Action cancelCallback)
         {
             return Task.Factory.StartNew(() =>
             {
-                OnProgress("Scanning for files started...");
+                progressCallback("Scanning for files started.");
+                ScanIsRunning = true;
                 var timeStamp = new DateTime();
 
                 while (!token.IsCancellationRequested)
@@ -65,9 +54,43 @@ namespace GroutItToGw
 
                     Thread.Sleep(1000);
                 }
-
-                OnProgress("Scanning for files stopped.");
+                ScanIsRunning = false;
+                cancelCallback();
             });
+        }
+
+        //public method to fire up FilesScanningAsync()
+        public void StartFilesScan()
+        {
+            cTokenSource = new CancellationTokenSource();
+            FilesScanAsync(cTokenSource.Token, OnScanProgress, OnScanCancelled);
+        }
+
+        //public method to stop FilesScanningAsync()
+        public void StopFilesScan()
+        {
+            if (cTokenSource != null && !cTokenSource.IsCancellationRequested)
+            {
+                cTokenSource.Cancel();
+            }
+        }
+
+        // trigger ScanProgress event and write to log
+        protected virtual void OnScanProgress(string progressMessage)
+        {
+            WriteToLog(progressMessage);
+            if (ScanProgress != null) { 
+                ScanProgress(this, new AppProgressEventArgs(progressMessage));
+            }
+        }
+
+        // trigger ScanProgress event, trigger ScanCancelled event and write to log
+        protected virtual void OnScanCancelled()
+        {
+            var cancelMessage = "Scanning for files stopped.";
+            WriteToLog(cancelMessage);
+            if (ScanProgress != null) { ScanProgress(this, new AppProgressEventArgs(cancelMessage)); }
+            if (ScanCancelled != null) { ScanCancelled(this, EventArgs.Empty); }
         }
 
         //write log entry to the file GroutItToGwLog.txt
@@ -77,15 +100,6 @@ namespace GroutItToGw
             {
                 logWriter.WriteLine(String.Format("{0:yyyy-MM-dd HH:mm:ss} : {1}", DateTime.Now, logEntry));
             }
-        }
-
-        // trigger Progress event and write to log
-        protected virtual string OnProgress(string progressMessage)
-        {
-            this.ProgressMessage = progressMessage;
-            WriteToLog(progressMessage);
-            if (Progress != null) { Progress(this, EventArgs.Empty); }
-            return progressMessage;
         }
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
