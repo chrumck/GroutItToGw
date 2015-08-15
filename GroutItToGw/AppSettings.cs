@@ -25,11 +25,11 @@ namespace GroutItToGw
             set { this.folderScanSeconds = (value >= 1 && value <= 3600) ? value : folderScanSeconds; }
         }
 
-        private int outputFileIntervalMinutes;
-        public int OutputFileIntervalMinutes
+        private int outputFileIntervalSeconds;
+        public int OutputFileIntervalSeconds
         {
-            get { return this.outputFileIntervalMinutes; }
-            set { this.outputFileIntervalMinutes = (value >= 1 && value <= 3600) ? value : outputFileIntervalMinutes; }
+            get { return this.outputFileIntervalSeconds; }
+            set { this.outputFileIntervalSeconds = (value >= 1 && value <= 3600) ? value : outputFileIntervalSeconds; }
         }
 
         public string ExtCLICommand { get; set; }
@@ -45,7 +45,7 @@ namespace GroutItToGw
             this.ErrorFolder = Application.StartupPath + @"\error";
             this.OutputFolder = Application.StartupPath + @"\output";
             this.FolderScanSeconds = 5;
-            this.OutputFileIntervalMinutes = 1;
+            this.OutputFileIntervalSeconds = 60;
 
         }
         

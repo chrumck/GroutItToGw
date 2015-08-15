@@ -61,6 +61,13 @@ namespace GroutItToGw
             appMainService.StopFilesScan();
         }
 
+        //event delegate BtnSettings_Click
+        private void BtnSettings_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Settings can be changed in 'AppSettings.xml' file in directory:\n " + Application.StartupPath,
+                "GroutItToGw Settings", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
         //event delegate BtnClose_Click
         private void BtnClose_Click(object sender, EventArgs e)
         {
@@ -105,6 +112,8 @@ namespace GroutItToGw
                 appMainService.StopFilesScan();
             }
         }
+
+        
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers

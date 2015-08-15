@@ -20,12 +20,12 @@ namespace GroutItToGw
         
         private AppSettings appSettings;
         private AppUtilities appUtilities;
-        private FileConvertService fileConvertService;
+        private GroutItToGwService fileConvertService;
         
         private CancellationTokenSource cTokenSource;
 
         //Constructors---------------------------------------------------------------------------------------------------------//
-        public AppMainService(AppSettings appSettings, AppUtilities appUtilities, FileConvertService fileConvertService)
+        public AppMainService(AppSettings appSettings, AppUtilities appUtilities, GroutItToGwService fileConvertService)
         {
             this.appSettings = appSettings;
             this.appUtilities = appUtilities;
@@ -45,32 +45,14 @@ namespace GroutItToGw
         //public method to fire up FilesScanningAsync()
         public void StartFilesScan()
         {
-            if (!Directory.Exists(appSettings.InputFolder))
+            var checkFoldersMessage = CheckFoldersIfExist();
+            if (!String.IsNullOrEmpty(checkFoldersMessage))
             {
-                OnScanCancelled("Input folder '" + appSettings.InputFolder + "' not found");
+                OnScanCancelled(checkFoldersMessage);
                 return;
             }
-
-            if (!Directory.Exists(appSettings.ProcessedFolder))
-            {
-                OnScanCancelled("Processed folder '" + appSettings.ProcessedFolder + "' not found");
-                return;
-            }
-
-            if (!Directory.Exists(appSettings.ErrorFolder))
-            {
-                OnScanCancelled("Error folder '" + appSettings.ErrorFolder + "' not found");
-                return;
-            } 
-
-            if (!Directory.Exists(appSettings.OutputFolder))
-            {
-                OnScanCancelled("Output folder '" + appSettings.OutputFolder + "' not found");
-                return;
-            } 
-
             cTokenSource = new CancellationTokenSource();
-            FilesScanAsync(cTokenSource.Token, OnScanProgress, OnScanCancelled);
+            FilesScanAsync();
         }
 
         //public method to stop FilesScanningAsync()
@@ -85,15 +67,123 @@ namespace GroutItToGw
 
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
-        
+      
+        //main async method running infinite loop to scan files
+        protected virtual Task FilesScanAsync()
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                OnScanProgress("Scanning for files started.");
+                ScanIsRunning = true;
+                var timeStamp = new DateTime();
+
+                while (!cTokenSource.Token.IsCancellationRequested)
+                {
+                    timeStamp = DateTime.Now;
+                    if ((timeStamp.Hour * 3600 + timeStamp.Minute * 60 + timeStamp.Second) % appSettings.FolderScanSeconds != 0)
+                    {
+                        Thread.Sleep(600);
+                        continue;
+                    }
+                    DoWorkOnInterval();
+                    Thread.Sleep(1000);
+                }
+
+                ScanIsRunning = false;
+                OnScanCancelled("");
+            });
+        }
+
+        //the actual task to be run on an interval
+        protected virtual void DoWorkOnInterval()
+        {
+            var checkFoldersMessage = CheckFoldersIfExist();
+            if (!String.IsNullOrEmpty(checkFoldersMessage))
+            {
+                OnScanProgress(checkFoldersMessage);
+                return;
+            }
+
+            IEnumerable<FileInfo> inputFileInfoList;
+            try
+            {
+                inputFileInfoList = new DirectoryInfo(appSettings.InputFolder)
+                    .EnumerateFiles("*.csv", SearchOption.TopDirectoryOnly);
+            }
+            catch (Exception exception)
+            {
+                OnScanProgress("Error scanning folder: " + exception.GetBaseException().Message);
+                return;
+            }
+            foreach (var inputFileInfo in inputFileInfoList)
+            {
+                var inputFilePath = appSettings.InputFolder + @"\" + inputFileInfo.Name;
+                var outputFilePath = (appSettings.OutputFolder + @"\" + 
+                    inputFileInfo.Name.Remove(inputFileInfo.Name.Length - 3) + "txt");
+                var processedFilePath = appSettings.ProcessedFolder + @"\" + inputFileInfo.Name;
+                var errorFilePath = appSettings.ErrorFolder + @"\" + inputFileInfo.Name;
+
+                string[] inputFileRows;
+                try
+                {
+                    inputFileRows = File.ReadAllLines(inputFilePath);
+                }
+                catch (Exception exception)
+                {
+                    OnScanProgress("Error reading file: " + exception.GetBaseException().Message);
+                    continue;
+                }
+
+                OnScanProgress("Processing file " + inputFileInfo.Name);
+                bool processSucceeded = false;
+                try
+                { 
+                    var outputFileData = fileConvertService.ConvertGroutItToGw(inputFileInfo.Name, inputFileRows);
+                    File.WriteAllLines(outputFilePath, outputFileData);
+
+                    if (File.Exists(processedFilePath)) { File.Delete(processedFilePath); }
+                    File.Move(inputFilePath, processedFilePath);
+
+                    processSucceeded = true;
+                }
+                catch (Exception exception)
+                {
+                    OnScanProgress("Error processing file " + inputFileInfo.Name +
+                        " :" + exception.GetBaseException().Message);
+                }
+
+                if (!processSucceeded)
+                {
+                    try
+                    {
+                        if (File.Exists(errorFilePath)) { File.Delete(errorFilePath); }
+                        File.Move(inputFilePath, errorFilePath);
+                    }
+                    catch { }    
+                }
+            }
+
+        }
+
+        //check if folders exist
+        protected virtual string CheckFoldersIfExist()
+        {
+            if (!Directory.Exists(appSettings.InputFolder))
+                { return "'Input' folder '" + appSettings.InputFolder + "' not found"; }
+            if (!Directory.Exists(appSettings.ProcessedFolder))
+                { return "'Processed' folder '" + appSettings.ProcessedFolder + "' not found"; }
+            if (!Directory.Exists(appSettings.ErrorFolder)) 
+                { return "'Error' folder '" + appSettings.ErrorFolder + "' not found"; }
+            if (!Directory.Exists(appSettings.OutputFolder))
+                { return "'Output' folder '" + appSettings.OutputFolder + "' not found"; } 
+            return String.Empty;
+        }
+
         // trigger ScanProgress event and write to log
         protected virtual void OnScanProgress(string progressMessage)
         {
             appUtilities.WriteToLog(progressMessage);
-            if (ScanProgress != null)
-            {
-                ScanProgress(this, new AppProgressEventArgs(progressMessage));
-            }
+            if (ScanProgress != null) { ScanProgress(this, new AppProgressEventArgs(progressMessage));}
         }
 
         // trigger ScanProgress event, trigger ScanCancelled event and write to log
@@ -102,61 +192,6 @@ namespace GroutItToGw
             cancelMessage = (!String.IsNullOrEmpty(cancelMessage)) ? cancelMessage : "Scanning for files stopped.";
             appUtilities.WriteToLog(cancelMessage);
             if (ScanCancelled != null) { ScanCancelled(this, new AppProgressEventArgs(cancelMessage)); }
-        }
-
-        
-        //main async method running infinite loop to scan files
-        protected virtual Task FilesScanAsync(CancellationToken token, Action<string> progressCallback, Action<string> cancelCallback)
-        {
-            return Task.Factory.StartNew(() =>
-            {
-                progressCallback("Scanning for files started.");
-                ScanIsRunning = true;
-                var timeStamp = new DateTime();
-
-                while (!token.IsCancellationRequested)
-                {
-                    timeStamp = DateTime.Now;
-
-                    if ((timeStamp.Hour * 3600 + timeStamp.Minute * 60 + timeStamp.Second) % appSettings.FolderScanSeconds != 0)
-                    {
-                        Thread.Sleep(600);
-                        continue;
-                    }
-                    var inpuDirectoryInfo = new DirectoryInfo(appSettings.InputFolder);
-                    var inputFileInfoList = inpuDirectoryInfo.EnumerateFiles("*.csv", SearchOption.TopDirectoryOnly);
-                    foreach (var inputFileInfo in inputFileInfoList)
-                    {
-                        var inputFilePath = appSettings.InputFolder + @"\" + inputFileInfo.Name;
-                        var outputFilePath = (appSettings.OutputFolder + @"\" + inputFileInfo.Name);
-                        outputFilePath = outputFilePath.Remove(outputFilePath.Length - 3) + "txt";
-                        var processedFilePath = appSettings.ProcessedFolder + @"\" + inputFileInfo.Name;
-                        var errorFilePath = appSettings.ErrorFolder + @"\" + inputFileInfo.Name;
-
-                        try
-                        {
-                            progressCallback("Processing file " + inputFileInfo.Name);
-                            var outputFileData = fileConvertService.ConvertGroutItToGw(inputFileInfo.Name);
-                            File.WriteAllLines(outputFilePath, outputFileData);
-
-                            if (File.Exists(processedFilePath)) { File.Delete(processedFilePath); }
-                            File.Move(inputFilePath, processedFilePath);
-                        }
-                        catch (Exception exception)
-                        {
-                            
-                            progressCallback("Error processing file " + inputFileInfo.Name + 
-                                " :" + exception.GetBaseException().Message);
-
-                            if (File.Exists(errorFilePath)) { File.Delete(errorFilePath); }
-                            File.Move(inputFilePath, errorFilePath);
-                        }                        
-                    }
-                    Thread.Sleep(1000);
-                }
-                ScanIsRunning = false;
-                cancelCallback("");
-            });
         }
         
 

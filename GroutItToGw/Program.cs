@@ -19,7 +19,7 @@ namespace GroutItToGw
 
             var appSettings = new AppSettings();
             var appUtilities = new AppUtilities(appSettings);
-            var fileConvertService = new FileConvertService(appSettings, appUtilities);
+            var fileConvertService = new GroutItToGwService(appSettings, appUtilities);
             var appMainService = new AppMainService(appSettings, appUtilities, fileConvertService);
             Application.Run(new FormMain(appMainService));
         }

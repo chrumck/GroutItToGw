@@ -7,7 +7,7 @@ using System.Text;
 
 namespace GroutItToGw
 {
-    public class FileConvertService
+    public class GroutItToGwService
     {
         //Fields and Properties------------------------------------------------------------------------------------------------//
 
@@ -36,7 +36,7 @@ namespace GroutItToGw
 
         //Constructors---------------------------------------------------------------------------------------------------------//
 
-        public FileConvertService(AppSettings appSettings, AppUtilities appUtilities)
+        public GroutItToGwService(AppSettings appSettings, AppUtilities appUtilities)
         {
             this.appSettings = appSettings;
             this.appUtilities = appUtilities;
@@ -45,10 +45,8 @@ namespace GroutItToGw
         //Methods--------------------------------------------------------------------------------------------------------------//
 
         //GroutToGw - converts file from GroutIt format to GW
-        public IList<string> ConvertGroutItToGw(string inputFileName) 
+        public IList<string> ConvertGroutItToGw(string inputFileName, string[] inputFileRows) 
         {
-            //reading from file and checking if there is any data
-            string[] inputFileRows = File.ReadAllLines(appSettings.InputFolder + @"\" + inputFileName);
             if (inputFileRows.Length < 4) 
                 { throw new ArgumentException("File does not seem to contain any data"); }
 
@@ -64,7 +62,6 @@ namespace GroutItToGw
                 }
             }
 
-            //checking if format of inputFileData correct
             checkInpuFileData(inputFileData);
                         
             // Initializing MyFile and setting constant (common) parameters 
@@ -84,8 +81,10 @@ namespace GroutItToGw
                 if (String.IsNullOrEmpty(inputFileData[i,0])) { continue; }
                 var rowSeconds = Convert.ToInt32(double.Parse(inputFileData[i, 0]));
 
-                if (i != 3 && i != inputFileRows.Length - 1 && Math.Abs(rowSeconds - incTime) > 1 && (rowSeconds - incTime) < 0)
-                    { continue; }
+                if (i != 3 &&
+                    rowSeconds - incTime < 0 &&
+                    i != inputFileRows.Length - 1
+                    ) { continue; }
 
                 myFileObject.Recs.Add(new Ty_Rec()
                 {
@@ -94,7 +93,7 @@ namespace GroutItToGw
                     PR = inputFileData[i, 5],
                     VOL = inputFileData[i, 7]
                 });
-                incTime += appSettings.OutputFileIntervalMinutes * 60;
+                incTime += appSettings.OutputFileIntervalSeconds;
             }
 
             //Creating and writing output file
@@ -125,9 +124,9 @@ namespace GroutItToGw
             if (inputFileData[0, 18] != "HTRANCHE[ft]")
             { throw new ArgumentException("Input format not as expected (HTRANCHE)"); }
             if (inputFileData[0, 12] != "DATE")
-            { throw new ArgumentException("Input format not as expected (HTRANCHE - DATE)"); }
+            { throw new ArgumentException("Input format not as expected (DATE)"); }
             if (inputFileData[0, 13] != "TIME")
-            { throw new ArgumentException("Input format not as expected (HTRANCHE - TIME)"); }
+            { throw new ArgumentException("Input format not as expected (TIME)"); }
             if (inputFileData[2, 0] != "TPS[s]")
             { throw new ArgumentException("Input format not as expected (TPS)"); }
             if (inputFileData[2, 3] != "DEB[US gal/min]")

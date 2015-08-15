@@ -23,10 +23,11 @@ namespace GroutItToGw
         //write log entry to the file GroutItToGwLog.txt
         public void WriteToLog(string logEntry)
         {
-            using (var logWriter = File.AppendText("GroutItToGwLog.txt"))
+            try
             {
-                logWriter.WriteLine(String.Format("{0:yyyy-MM-dd HH:mm:ss} : {1}", DateTime.Now, logEntry));
+                File.AppendAllText("GroutItToGwLog.txt", String.Format("\n{0:yyyy-MM-dd HH:mm:ss} : {1}", DateTime.Now, logEntry));
             }
+            catch { }
         }
     }
 }
