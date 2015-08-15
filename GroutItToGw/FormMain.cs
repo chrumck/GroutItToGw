@@ -31,6 +31,19 @@ namespace GroutItToGw
 
         //Methods--------------------------------------------------------------------------------------------------------------//
 
+        private void FormMain_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                appMainService.ReadAppSettingsFromXml();
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show("Error loading settings: " + exception.GetBaseException().Message, "GroutItToGw Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+        }
+
         //event delegate BtnStart_Click
         private void btnStart_Click(object sender, EventArgs e)
         {
@@ -67,14 +80,16 @@ namespace GroutItToGw
         }
 
         //event delegate to subscibe to appMainService.ScanCancelled event
-        private void updateOnScanCancelled(object sender, EventArgs args)
+        private void updateOnScanCancelled(object sender, AppProgressEventArgs args)
         {
             if (InvokeRequired)
             {
-                Invoke(new Action<object, EventArgs>(updateOnScanCancelled), sender, args);
+                Invoke(new Action<object, AppProgressEventArgs>(updateOnScanCancelled), sender, args);
                 return;
             }
             BtnStart.Enabled = true;
+            BtnStop.Enabled = false;
+            TxBStatus.Text = DateTime.Now.ToString("HH:mm:ss") + ":" + args.progressMessage;
             if (FormClosePending) { this.Close(); }
         }
 

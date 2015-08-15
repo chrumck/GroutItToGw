@@ -31,8 +31,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             this.BtnStart = new System.Windows.Forms.Button();
             this.BtnStop = new System.Windows.Forms.Button();
-            this.LblErrCount = new System.Windows.Forms.Label();
-            this.Label2 = new System.Windows.Forms.Label();
             this.Label1 = new System.Windows.Forms.Label();
             this.TxBStatus = new System.Windows.Forms.TextBox();
             this.BtnSettings = new System.Windows.Forms.Button();
@@ -62,39 +60,21 @@
             this.BtnStop.UseVisualStyleBackColor = true;
             this.BtnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
-            // LblErrCount
-            // 
-            this.LblErrCount.AutoSize = true;
-            this.LblErrCount.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LblErrCount.Location = new System.Drawing.Point(156, 180);
-            this.LblErrCount.Name = "LblErrCount";
-            this.LblErrCount.Size = new System.Drawing.Size(14, 13);
-            this.LblErrCount.TabIndex = 19;
-            this.LblErrCount.Text = "0";
-            // 
-            // Label2
-            // 
-            this.Label2.AutoSize = true;
-            this.Label2.Location = new System.Drawing.Point(4, 180);
-            this.Label2.Name = "Label2";
-            this.Label2.Size = new System.Drawing.Size(146, 13);
-            this.Label2.TabIndex = 18;
-            this.Label2.Text = "Errors Count Since Last Start:";
-            // 
             // Label1
             // 
             this.Label1.AutoSize = true;
-            this.Label1.Location = new System.Drawing.Point(4, 137);
+            this.Label1.Location = new System.Drawing.Point(4, 123);
             this.Label1.Name = "Label1";
-            this.Label1.Size = new System.Drawing.Size(78, 13);
+            this.Label1.Size = new System.Drawing.Size(120, 13);
             this.Label1.TabIndex = 17;
-            this.Label1.Text = "Last Log Entry:";
+            this.Label1.Text = "Last Progress Message:";
             // 
             // TxBStatus
             // 
-            this.TxBStatus.Location = new System.Drawing.Point(3, 154);
+            this.TxBStatus.Location = new System.Drawing.Point(4, 138);
+            this.TxBStatus.Multiline = true;
             this.TxBStatus.Name = "TxBStatus";
-            this.TxBStatus.Size = new System.Drawing.Size(360, 20);
+            this.TxBStatus.Size = new System.Drawing.Size(360, 43);
             this.TxBStatus.TabIndex = 16;
             // 
             // BtnSettings
@@ -109,7 +89,7 @@
             // 
             // BtnClose
             // 
-            this.BtnClose.Location = new System.Drawing.Point(274, 180);
+            this.BtnClose.Location = new System.Drawing.Point(274, 184);
             this.BtnClose.Name = "BtnClose";
             this.BtnClose.Size = new System.Drawing.Size(89, 25);
             this.BtnClose.TabIndex = 14;
@@ -124,8 +104,6 @@
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.ClientSize = new System.Drawing.Size(367, 211);
-            this.Controls.Add(this.LblErrCount);
-            this.Controls.Add(this.Label2);
             this.Controls.Add(this.Label1);
             this.Controls.Add(this.TxBStatus);
             this.Controls.Add(this.BtnSettings);
@@ -136,8 +114,9 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "FormMain";
-            this.Text = "GroutItToGw";
+            this.Text = "GroutItToGw 0.9.0.0";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
+            this.Load += new System.EventHandler(this.FormMain_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -147,8 +126,6 @@
 
         internal System.Windows.Forms.Button BtnStart;
         internal System.Windows.Forms.Button BtnStop;
-        internal System.Windows.Forms.Label LblErrCount;
-        internal System.Windows.Forms.Label Label2;
         internal System.Windows.Forms.Label Label1;
         internal System.Windows.Forms.TextBox TxBStatus;
         internal System.Windows.Forms.Button BtnSettings;

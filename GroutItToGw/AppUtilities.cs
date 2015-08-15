@@ -1,0 +1,32 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+
+namespace GroutItToGw
+{
+    public class AppUtilities
+    {
+        //Fields and Properties------------------------------------------------------------------------------------------------//
+
+        private AppSettings appSettings;
+
+        //Constructors---------------------------------------------------------------------------------------------------------//
+        public AppUtilities(AppSettings appSettings)
+        {
+            this.appSettings = appSettings;
+        }
+
+        //Methods--------------------------------------------------------------------------------------------------------------//
+
+        //write log entry to the file GroutItToGwLog.txt
+        public void WriteToLog(string logEntry)
+        {
+            using (var logWriter = File.AppendText("GroutItToGwLog.txt"))
+            {
+                logWriter.WriteLine(String.Format("{0:yyyy-MM-dd HH:mm:ss} : {1}", DateTime.Now, logEntry));
+            }
+        }
+    }
+}

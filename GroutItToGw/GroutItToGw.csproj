@@ -56,6 +56,8 @@
     <Compile Include="AppProgressEventArgs.cs" />
     <Compile Include="AppSettings.cs" />
     <Compile Include="AppMainService.cs" />
+    <Compile Include="AppUtilities.cs" />
+    <Compile Include="FileConvertService.cs" />
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -18,7 +18,9 @@ namespace GroutItToGw
             Application.SetCompatibleTextRenderingDefault(false);
 
             var appSettings = new AppSettings();
-            var appMainService = new AppMainService(appSettings);
+            var appUtilities = new AppUtilities(appSettings);
+            var fileConvertService = new FileConvertService(appSettings, appUtilities);
+            var appMainService = new AppMainService(appSettings, appUtilities, fileConvertService);
             Application.Run(new FormMain(appMainService));
         }
     }

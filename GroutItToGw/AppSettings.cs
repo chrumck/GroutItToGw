@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Windows.Forms;
 using System.Xml;
 
 namespace GroutItToGw
@@ -14,13 +15,21 @@ namespace GroutItToGw
 
         public string InputFolder { get; set; }
         public string ProcessedFolder { get; set; }
+        public string ErrorFolder { get; set; }
         public string OutputFolder { get; set; }
 
         private int folderScanSeconds;
         public int FolderScanSeconds 
         {
             get { return this.folderScanSeconds; }
-            set { this.folderScanSeconds = (value > 1 && value <= 3600) ? value : folderScanSeconds; }
+            set { this.folderScanSeconds = (value >= 1 && value <= 3600) ? value : folderScanSeconds; }
+        }
+
+        private int outputFileIntervalMinutes;
+        public int OutputFileIntervalMinutes
+        {
+            get { return this.outputFileIntervalMinutes; }
+            set { this.outputFileIntervalMinutes = (value >= 1 && value <= 3600) ? value : outputFileIntervalMinutes; }
         }
 
         public string ExtCLICommand { get; set; }
@@ -30,10 +39,13 @@ namespace GroutItToGw
 
         public AppSettings()
         {
-            this.InputFolder = @"\input";
-            this.ProcessedFolder = @"\processed";
-            this.OutputFolder = @"\output";
-            this.folderScanSeconds = 10;
+            
+            this.InputFolder = Application.StartupPath + @"\input";
+            this.ProcessedFolder = Application.StartupPath + @"\processed";
+            this.ErrorFolder = Application.StartupPath + @"\error";
+            this.OutputFolder = Application.StartupPath + @"\output";
+            this.FolderScanSeconds = 5;
+            this.OutputFileIntervalMinutes = 1;
 
         }
         
@@ -49,6 +61,8 @@ namespace GroutItToGw
         public void ReadFromXML(string fileName)
         {
             var settingsFile = new XmlDocument();
+            if (!File.Exists(Application.StartupPath + @"\" + fileName)) 
+                { throw new ArgumentException("Settings file '" + fileName + "' does not exit."); }
             settingsFile.Load(fileName);
             var settingsMainNode = settingsFile.SelectSingleNode("AppSettings");
             if (settingsMainNode == null)
@@ -68,7 +82,7 @@ namespace GroutItToGw
         private void setPropertyFromXmlNode(XmlNode node, PropertyInfo[] properties)
         {
             var property = properties.FirstOrDefault(x => x.Name == node.Name);
-            if (property != null)
+            if (property != null && !String.IsNullOrEmpty(node.InnerText))
             {
                 if (property.PropertyType == typeof(int)) { property.SetValue(this, int.Parse(node.InnerText), null); }
                 if (property.PropertyType == typeof(String)) { property.SetValue(this, node.InnerText, null); }
