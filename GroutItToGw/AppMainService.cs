@@ -139,8 +139,8 @@ namespace GroutItToGw
                             var outputFileData = fileConvertService.ConvertGroutItToGw(inputFileInfo.Name);
                             File.WriteAllLines(outputFilePath, outputFileData);
 
-                            if (File.Exists(outputFilePath)) { File.Delete(outputFilePath); }
-                            File.Move(inputFilePath, outputFilePath);
+                            if (File.Exists(processedFilePath)) { File.Delete(processedFilePath); }
+                            File.Move(inputFilePath, processedFilePath);
                         }
                         catch (Exception exception)
                         {
