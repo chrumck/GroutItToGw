@@ -17,6 +17,7 @@ namespace GroutItToGw
         public string ProcessedFolder { get; set; }
         public string ErrorFolder { get; set; }
         public string OutputFolder { get; set; }
+        public string DateTimeFormat { get; set; }
 
         private int folderScanSeconds;
         public int FolderScanSeconds 
@@ -44,6 +45,7 @@ namespace GroutItToGw
             this.ProcessedFolder = Application.StartupPath + @"\processed";
             this.ErrorFolder = Application.StartupPath + @"\error";
             this.OutputFolder = Application.StartupPath + @"\output";
+            this.DateTimeFormat = @"dd/MM/yyyy HH:mm:ss";
             this.FolderScanSeconds = 5;
             this.OutputFileIntervalSeconds = 60;
 

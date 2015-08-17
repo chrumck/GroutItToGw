@@ -72,7 +72,7 @@ namespace GroutItToGw
             myFileObject.Tran = inputFileData[1, 5];
             myFileObject.HTranche = inputFileData[1, 18];
             myFileObject.FDate = DateTime.ParseExact(inputFileData[1, 12] + " " + inputFileData[1, 13],
-                    "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+                    appSettings.DateTimeFormat, CultureInfo.InvariantCulture);
 
             //Reading records from inputFileData and adding to MyFile.Recs list
             var incTime = 0;
@@ -121,19 +121,19 @@ namespace GroutItToGw
             { throw new ArgumentException("Input format not as expected (FORA)"); }
             if (inputFileData[0, 5] != "TRAN")
             { throw new ArgumentException("Input format not as expected (TRAN)"); }
-            if (inputFileData[0, 18] != "HTRANCHE[ft]")
+            if (!inputFileData[0, 18].Contains("HTRANCHE"))
             { throw new ArgumentException("Input format not as expected (HTRANCHE)"); }
             if (inputFileData[0, 12] != "DATE")
             { throw new ArgumentException("Input format not as expected (DATE)"); }
             if (inputFileData[0, 13] != "TIME")
             { throw new ArgumentException("Input format not as expected (TIME)"); }
-            if (inputFileData[2, 0] != "TPS[s]")
+            if (!inputFileData[2, 0].Contains("TPS"))
             { throw new ArgumentException("Input format not as expected (TPS)"); }
-            if (inputFileData[2, 3] != "DEB[US gal/min]")
+            if (!inputFileData[2, 3].Contains("DEB"))
             { throw new ArgumentException("Input format not as expected (DEB)"); }
-            if (inputFileData[2, 5] != "PR[psi]")
+            if (!inputFileData[2, 5].Contains("PR"))
             { throw new ArgumentException("Input format not as expected (PR)"); }
-            if (inputFileData[2, 7] != "VOL[US gal]")
+            if (!inputFileData[2, 7].Contains("VOL"))
             { throw new ArgumentException("Input format not as expected (VOL)"); }
         }
 
