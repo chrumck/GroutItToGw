@@ -122,6 +122,18 @@ namespace GroutItToGw
                     inputFileInfo.Name.Remove(inputFileInfo.Name.Length - 3) + "txt");
                 var processedFilePath = appSettings.ProcessedFolder + @"\" + inputFileInfo.Name;
                 var errorFilePath = appSettings.ErrorFolder + @"\" + inputFileInfo.Name;
+                var ignoreFilePath = appSettings.IgnoreFolder + @"\" + inputFileInfo.Name;
+
+                if (ingoreFile(inputFileInfo.Name)) {
+                    OnScanProgress("File ignored: " + inputFileInfo.Name);
+                    try
+                    {
+                        if (File.Exists(ignoreFilePath)) { File.Delete(ignoreFilePath); }
+                        File.Move(inputFilePath, ignoreFilePath);
+                    }
+                    catch { } 
+                    continue; 
+                }
 
                 string[] inputFileRows;
                 try
@@ -175,7 +187,9 @@ namespace GroutItToGw
             if (!Directory.Exists(appSettings.ErrorFolder)) 
                 { return "'Error' folder '" + appSettings.ErrorFolder + "' not found"; }
             if (!Directory.Exists(appSettings.OutputFolder))
-                { return "'Output' folder '" + appSettings.OutputFolder + "' not found"; } 
+                { return "'Output' folder '" + appSettings.OutputFolder + "' not found"; }
+            if (!Directory.Exists(appSettings.IgnoreFolder))
+                { return "'Ignore' folder '" + appSettings.IgnoreFolder + "' not found"; } 
             return String.Empty;
         }
 
@@ -192,6 +206,19 @@ namespace GroutItToGw
             cancelMessage = (!String.IsNullOrEmpty(cancelMessage)) ? cancelMessage : "Scanning for files stopped.";
             appUtilities.WriteToLog(cancelMessage);
             if (ScanCancelled != null) { ScanCancelled(this, new AppProgressEventArgs(cancelMessage)); }
+        }
+
+        //check if file should ignored, move to ignored folder and return true if yes
+        protected virtual bool ingoreFile(string fileName)
+        {
+            if (String.IsNullOrEmpty(appSettings.IgnoreFileNames)) { return false; }
+            string[] ignoreFileNamesArray = appSettings.IgnoreFileNames.Split(';');
+
+            for (int i = 0; i < ignoreFileNamesArray.Length; i++)
+            {
+                if (fileName.Contains(ignoreFileNamesArray[i])) { return true; }
+            }
+            return false;
         }
         
 

@@ -72,7 +72,7 @@ namespace GroutItToGw
             myFileObject.Tran = inputFileData[1, 5];
             myFileObject.HTranche = inputFileData[1, 18];
             myFileObject.FDate = DateTime.ParseExact(inputFileData[1, 12] + " " + inputFileData[1, 13],
-                    appSettings.DateTimeFormat, CultureInfo.InvariantCulture);
+                    appSettings.InputFileDateTimeFormat, CultureInfo.InvariantCulture);
 
             //Reading records from inputFileData and adding to MyFile.Recs list
             var incTime = 0;
