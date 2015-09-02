@@ -93,7 +93,11 @@ namespace GroutItToGw
                     PR = inputFileData[i, 5],
                     VOL = inputFileData[i, 7]
                 });
+
+                while (incTime <= rowSeconds)
+                {
                 incTime += appSettings.OutputFileIntervalSeconds;
+                }
             }
 
             //Creating and writing output file
