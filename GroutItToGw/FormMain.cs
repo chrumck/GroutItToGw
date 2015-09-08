@@ -49,7 +49,7 @@ namespace GroutItToGw
         {
             BtnStart.Enabled = false;
             BtnStop.Enabled = true;
-            TxBStatus.Text = DateTime.Now.ToString("HH:mm:ss") + ":Starting file scanning...";
+            TxBStatus.Text = DateTime.Now.ToString("yyyy-dd-MM HH:mm:ss") + ":Starting file scanning...";
             appMainService.StartFilesScan();
         }
 
@@ -57,7 +57,7 @@ namespace GroutItToGw
         private void btnStop_Click(object sender, EventArgs e)
         {
             BtnStop.Enabled = false;
-            TxBStatus.Text = DateTime.Now.ToString("HH:mm:ss") + ":Stopping file scanning...";
+            TxBStatus.Text = DateTime.Now.ToString("yyyy-dd-MM HH:mm:ss") + ":Stopping file scanning...";
             appMainService.StopFilesScan();
         }
 
@@ -83,7 +83,7 @@ namespace GroutItToGw
                 return;
             }
 
-            TxBStatus.Text = DateTime.Now.ToString("HH:mm:ss") + ":" + args.progressMessage;
+            TxBStatus.Text = DateTime.Now.ToString("yyyy-dd-MM HH:mm:ss") + ":" + args.progressMessage;
         }
 
         //event delegate to subscibe to appMainService.ScanCancelled event
@@ -96,7 +96,7 @@ namespace GroutItToGw
             }
             BtnStart.Enabled = true;
             BtnStop.Enabled = false;
-            TxBStatus.Text = DateTime.Now.ToString("HH:mm:ss") + ":" + args.progressMessage;
+            TxBStatus.Text = DateTime.Now.ToString("yyyy-dd-MM HH:mm:ss") + ":" + args.progressMessage;
             if (FormClosePending) { this.Close(); }
         }
 
@@ -108,7 +108,7 @@ namespace GroutItToGw
                 this.Enabled = false;
                 FormClosePending = true;
                 e.Cancel = true;
-                TxBStatus.Text = DateTime.Now.ToString("HH:mm:ss") + ":Closing GroutItToGw...";
+                TxBStatus.Text = DateTime.Now.ToString("yyyy-dd-MM HH:mm:ss") + ":Closing GroutItToGw...";
                 appMainService.StopFilesScan();
             }
         }

@@ -51,7 +51,7 @@ namespace GroutItToGw
                 { throw new ArgumentException("File does not seem to contain any data"); }
 
             //converting file data to 2-dimensional array[i,j] of strings
-            var dataArrayWidth = 20;
+            var dataArrayWidth = 25;
             string[,] inputFileData = new string[inputFileRows.Length, dataArrayWidth];
             for (int i = 0; i < inputFileRows.Length; i++)
             {

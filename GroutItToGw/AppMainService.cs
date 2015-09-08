@@ -75,12 +75,18 @@ namespace GroutItToGw
             {
                 OnScanProgress("Scanning for files started.");
                 ScanIsRunning = true;
-                var timeStamp = new DateTime();
 
                 while (!cTokenSource.Token.IsCancellationRequested)
                 {
-                    timeStamp = DateTime.Now;
-                    if ((timeStamp.Hour * 3600 + timeStamp.Minute * 60 + timeStamp.Second) % appSettings.FolderScanSeconds != 0)
+                    var timeStamp = DateTime.Now;
+                    bool isTimeToScan = (timeStamp.Hour * 3600 + timeStamp.Minute * 60 + timeStamp.Second) % 
+                        appSettings.FolderScanSeconds == 0;
+                    bool isTimeToKeepAlive = (appSettings.KeepAliveIntervalSeconds == 0) ? false :
+                        (timeStamp.Hour * 3600 + timeStamp.Minute * 60 + timeStamp.Second) 
+                            % appSettings.KeepAliveIntervalSeconds == 0;
+
+                    if (isTimeToKeepAlive) { OnScanProgress("This is Keep Alive log entry");}
+                    if (!isTimeToScan)
                     {
                         Thread.Sleep(600);
                         continue;
@@ -126,12 +132,7 @@ namespace GroutItToGw
 
                 if (ingoreFile(inputFileInfo.Name)) {
                     OnScanProgress("File ignored: " + inputFileInfo.Name);
-                    try
-                    {
-                        if (File.Exists(ignoreFilePath)) { File.Delete(ignoreFilePath); }
-                        File.Move(inputFilePath, ignoreFilePath);
-                    }
-                    catch { } 
+                    moveFile(inputFilePath, ignoreFilePath);
                     continue; 
                 }
 
@@ -153,9 +154,6 @@ namespace GroutItToGw
                     var outputFileData = fileConvertService.ConvertGroutItToGw(inputFileInfo.Name, inputFileRows);
                     File.WriteAllLines(outputFilePath, outputFileData);
 
-                    if (File.Exists(processedFilePath)) { File.Delete(processedFilePath); }
-                    File.Move(inputFilePath, processedFilePath);
-
                     processSucceeded = true;
                 }
                 catch (Exception exception)
@@ -164,15 +162,8 @@ namespace GroutItToGw
                         " :" + exception.GetBaseException().Message);
                 }
 
-                if (!processSucceeded)
-                {
-                    try
-                    {
-                        if (File.Exists(errorFilePath)) { File.Delete(errorFilePath); }
-                        File.Move(inputFilePath, errorFilePath);
-                    }
-                    catch { }    
-                }
+                if (processSucceeded) { moveFile(inputFilePath, processedFilePath); }
+                if (!processSucceeded) { moveFile(inputFilePath, errorFilePath); }
             }
 
         }
@@ -219,6 +210,20 @@ namespace GroutItToGw
                 if (fileName.Contains(ignoreFileNamesArray[i])) { return true; }
             }
             return false;
+        }
+
+        //move file from sourceFolder to destinationFolder
+        protected virtual void moveFile(string sourceFilePath, string destinationFilePath)
+        {
+            try
+            {
+                if (File.Exists(destinationFilePath)) { File.Delete(destinationFilePath); }
+                File.Move(sourceFilePath, destinationFilePath);
+            }
+            catch
+            {
+                OnScanProgress("Could not move file to: " + destinationFilePath);
+            }    
         }
         
 

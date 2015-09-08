@@ -40,7 +40,7 @@
             // BtnStart
             // 
             this.BtnStart.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BtnStart.Location = new System.Drawing.Point(12, 8);
+            this.BtnStart.Location = new System.Drawing.Point(12, 5);
             this.BtnStart.Name = "BtnStart";
             this.BtnStart.Size = new System.Drawing.Size(109, 38);
             this.BtnStart.TabIndex = 12;
@@ -52,7 +52,7 @@
             // 
             this.BtnStop.Enabled = false;
             this.BtnStop.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BtnStop.Location = new System.Drawing.Point(12, 49);
+            this.BtnStop.Location = new System.Drawing.Point(12, 45);
             this.BtnStop.Name = "BtnStop";
             this.BtnStop.Size = new System.Drawing.Size(109, 38);
             this.BtnStop.TabIndex = 13;
@@ -63,7 +63,7 @@
             // Label1
             // 
             this.Label1.AutoSize = true;
-            this.Label1.Location = new System.Drawing.Point(1, 95);
+            this.Label1.Location = new System.Drawing.Point(1, 88);
             this.Label1.Name = "Label1";
             this.Label1.Size = new System.Drawing.Size(120, 13);
             this.Label1.TabIndex = 17;
@@ -71,15 +71,15 @@
             // 
             // TxBStatus
             // 
-            this.TxBStatus.Location = new System.Drawing.Point(4, 114);
+            this.TxBStatus.Location = new System.Drawing.Point(4, 104);
             this.TxBStatus.Multiline = true;
             this.TxBStatus.Name = "TxBStatus";
-            this.TxBStatus.Size = new System.Drawing.Size(360, 61);
+            this.TxBStatus.Size = new System.Drawing.Size(360, 76);
             this.TxBStatus.TabIndex = 16;
             // 
             // BtnSettings
             // 
-            this.BtnSettings.Location = new System.Drawing.Point(274, 8);
+            this.BtnSettings.Location = new System.Drawing.Point(274, 5);
             this.BtnSettings.Name = "BtnSettings";
             this.BtnSettings.Size = new System.Drawing.Size(89, 25);
             this.BtnSettings.TabIndex = 15;
@@ -114,7 +114,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "FormMain";
-            this.Text = "GroutItToGw 0.9.0.5 TDO";
+            this.Text = "GroutItToGw 0.9.0.6 TDO";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.ResumeLayout(false);
