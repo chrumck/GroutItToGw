@@ -33,20 +33,13 @@ namespace GroutItToGw
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-            try
-            {
-                appMainService.ReadAppSettingsFromXml();
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show("Error loading settings: " + exception.GetBaseException().Message, "GroutItToGw Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
+            readAppSettingsFromXmlHelper();
         }
 
         //event delegate BtnStart_Click
         private void btnStart_Click(object sender, EventArgs e)
         {
+            readAppSettingsFromXmlHelper();
             BtnStart.Enabled = false;
             BtnStop.Enabled = true;
             TxBStatus.Text = DateTime.Now.ToString("yyyy-dd-MM HH:mm:ss") + ":Starting file scanning...";
@@ -64,7 +57,10 @@ namespace GroutItToGw
         //event delegate BtnSettings_Click
         private void BtnSettings_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Settings can be changed in 'AppSettings.xml' file in directory:\n " + Application.StartupPath,
+            var settingsLoaded = readAppSettingsFromXmlHelper();
+            if (!settingsLoaded) { return; }
+
+            MessageBox.Show("Settings reloaded.\nSettings can be changed in 'AppSettings.xml' file in directory:\n " + Application.StartupPath,
                 "GroutItToGw Settings", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -118,6 +114,22 @@ namespace GroutItToGw
         //Helpers--------------------------------------------------------------------------------------------------------------//
         #region Helpers
 
+        //readAppSettings from xmlFile, show message box is exception thrown
+        private bool readAppSettingsFromXmlHelper()
+        {
+            var settingsLoaded = false;
+            try
+            {
+                appMainService.ReadAppSettingsFromXml();
+                settingsLoaded = true;
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show("Error loading settings: " + exception.GetBaseException().Message, "GroutItToGw Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+            return settingsLoaded;
+        }
 
         #endregion
         

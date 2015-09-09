@@ -76,7 +76,7 @@ namespace GroutItToGw
         {
             var settingsFile = new XmlDocument();
             if (!File.Exists(Application.StartupPath + @"\" + fileName)) 
-                { throw new ArgumentException("Settings file '" + fileName + "' does not exit."); }
+                { throw new ArgumentException("Settings file '" + fileName + "' does not exist."); }
             settingsFile.Load(fileName);
             var settingsMainNode = settingsFile.SelectSingleNode("AppSettings");
             if (settingsMainNode == null)
