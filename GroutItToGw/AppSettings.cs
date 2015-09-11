@@ -42,6 +42,13 @@ namespace GroutItToGw
             set { this.keepAliveIntervalSeconds = (value >= 0 && value <= 14400) ? value : keepAliveIntervalSeconds; }
         }
 
+        private int fileTooOldMinutes;
+        public int FileTooOldMinutes
+        {
+            get { return this.fileTooOldMinutes; }
+            set { this.fileTooOldMinutes = (value >= 0 && value <= 259200) ? value : fileTooOldMinutes; }
+        }
+
         public string ExtCLICommand { get; set; }
         public string ExtCLICommandArgs { get; set; }
 
@@ -59,8 +66,8 @@ namespace GroutItToGw
             this.InputFileDateTimeFormat = @"dd/MM/yyyy HH:mm:ss";
             this.FolderScanSeconds = 5;
             this.OutputFileIntervalSeconds = 60;
-            this.keepAliveIntervalSeconds = 3600;
-
+            this.KeepAliveIntervalSeconds = 3600;
+            this.FileTooOldMinutes = 0;
         }
         
         //Methods--------------------------------------------------------------------------------------------------------------//

@@ -79,11 +79,11 @@
             // 
             // BtnSettings
             // 
-            this.BtnSettings.Location = new System.Drawing.Point(274, 5);
+            this.BtnSettings.Location = new System.Drawing.Point(261, 5);
             this.BtnSettings.Name = "BtnSettings";
-            this.BtnSettings.Size = new System.Drawing.Size(89, 25);
+            this.BtnSettings.Size = new System.Drawing.Size(102, 25);
             this.BtnSettings.TabIndex = 15;
-            this.BtnSettings.Text = "Settings";
+            this.BtnSettings.Text = "Reload Settings";
             this.BtnSettings.UseVisualStyleBackColor = true;
             this.BtnSettings.Click += new System.EventHandler(this.BtnSettings_Click);
             // 
@@ -114,7 +114,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "FormMain";
-            this.Text = "GroutItToGw 0.9.0.7 TDO";
+            this.Text = "GroutItToGw 0.9.0.8 TDO";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.ResumeLayout(false);

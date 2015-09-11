@@ -62,7 +62,11 @@ namespace GroutItToGw
                 }
             }
 
-            checkInpuFileData(inputFileData);
+            //checking input data
+            checkInpuFileDataHelper(inputFileData);
+
+            //checking if file not too old
+            checkIfFileTooOldHelper(inputFileData);
                         
             // Initializing MyFile and setting constant (common) parameters 
             myFileObject = new Ty_IF();
@@ -104,12 +108,12 @@ namespace GroutItToGw
             var outputFileData = new List<string>();
             foreach (var rec in myFileObject.Recs)
             {
-                outputFileData.Add(encodeOutputFileRow(myFileObject.Fora + "_Stage", rec.RDate, myFileObject.Tran, "0"));
-                outputFileData.Add(encodeOutputFileRow(myFileObject.Fora + "_Phase", rec.RDate, myFileObject.Phase, "0"));
-                outputFileData.Add(encodeOutputFileRow(myFileObject.Fora + "_Vol", rec.RDate, rec.VOL, "0.00"));
-                outputFileData.Add(encodeOutputFileRow(myFileObject.Fora + "_Press", rec.RDate, rec.PR, "0.00"));
-                outputFileData.Add(encodeOutputFileRow(myFileObject.Fora + "_FlRate", rec.RDate, rec.BEB, "0.00"));
-                outputFileData.Add(encodeOutputFileRow(myFileObject.Fora + "_Height", rec.RDate, myFileObject.HTranche, "0"));
+                outputFileData.Add(encodeOutputFileRowHelper(myFileObject.Fora + "_Stage", rec.RDate, myFileObject.Tran, "0"));
+                outputFileData.Add(encodeOutputFileRowHelper(myFileObject.Fora + "_Phase", rec.RDate, myFileObject.Phase, "0"));
+                outputFileData.Add(encodeOutputFileRowHelper(myFileObject.Fora + "_Vol", rec.RDate, rec.VOL, "0.00"));
+                outputFileData.Add(encodeOutputFileRowHelper(myFileObject.Fora + "_Press", rec.RDate, rec.PR, "0.00"));
+                outputFileData.Add(encodeOutputFileRowHelper(myFileObject.Fora + "_FlRate", rec.RDate, rec.BEB, "0.00"));
+                outputFileData.Add(encodeOutputFileRowHelper(myFileObject.Fora + "_Height", rec.RDate, myFileObject.HTranche, "0"));
             }
             return outputFileData;
         }
@@ -119,7 +123,7 @@ namespace GroutItToGw
         #region Helpers
 
         //checkInpuFileData
-        private void checkInpuFileData(string[,] inputFileData)
+        private void checkInpuFileDataHelper(string[,] inputFileData)
         {
             if (inputFileData[0, 2] != "FORA")
             { throw new ArgumentException("Input format not as expected (FORA)"); }
@@ -141,8 +145,20 @@ namespace GroutItToGw
             { throw new ArgumentException("Input format not as expected (VOL)"); }
         }
 
+        //checkIfFileTooOld
+        private void checkIfFileTooOldHelper(string[,] inputFileData)
+        {
+            var fileDateTime = DateTime.ParseExact(inputFileData[1, 12] + " " + inputFileData[1, 13],
+                    appSettings.InputFileDateTimeFormat, CultureInfo.InvariantCulture);
+            if (appSettings.FileTooOldMinutes != 0 && fileDateTime.AddMinutes(appSettings.FileTooOldMinutes) < DateTime.Now)
+            {
+                throw new ArgumentException(
+                    String.Format("File timestamp {0:yyyy-MM-dd HH:mm:ss} is too old.",fileDateTime));
+            }
+        }
+
         //encodeOutputFileRow
-        private string encodeOutputFileRow(string MPName, DateTime dateTime, string outputValueString, string valueFormat)
+        private string encodeOutputFileRowHelper(string MPName, DateTime dateTime, string outputValueString, string valueFormat)
         {
             double outputValue;
             outputValue = double.TryParse(outputValueString, out outputValue) ? outputValue : 9999;
